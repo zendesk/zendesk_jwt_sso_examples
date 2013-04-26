@@ -2,7 +2,11 @@
 
 The files in this repository are examples and not guaranteed to run or be correct. They should explain you how you can make Zendesk SSO worh with JWT from your stack. Pull requests much appreciated.
 
-# Contributing
+## Documentation
+
+Further documentation on JWT based Zendesk SSO is available [on our developer website](http://developer.zendesk.com/)
+
+## Contributing
 
 Examples and improvements much appreciated.
 
