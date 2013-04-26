@@ -4,7 +4,7 @@ The files in this repository are examples and not guaranteed to run or be correc
 
 ## Documentation
 
-Further documentation on JWT based Zendesk SSO is available [on our developer website](http://developer.zendesk.com/)
+Further documentation on JWT based Zendesk SSO is available [on our developer website](http://developer.zendesk.com/documentation/sso/)
 
 ## Contributing
 
