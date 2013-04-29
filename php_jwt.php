@@ -9,10 +9,11 @@ include_once "Authentication/JWT.php";
 
 $key       = "{my zendesk shared key}";
 $subdomain = "{my zendesk subdomain}";
+$now       = time();
 
 $token = array(
   "jti"   => md5($now . rand()),
-  "iat"   => time(),
+  "iat"   => $now,
   "name"  => $user->name,
   "email" => $user->email
 );
