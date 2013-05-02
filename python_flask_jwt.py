@@ -14,7 +14,7 @@ app.config['SUBDOMAIN'] = 'yoursite'
 @app.route('/zendesk-jwt')
 def sso_redirector():
  
-  payload = {
+	payload = {
 		"iat": int(time.time()),
 		"jti": str(uuid.uuid1()),
 		# populate these values from your data source
