@@ -8,13 +8,12 @@ import jwt
 import uuid
 
 def index(request):
-  now = int(time.time())
 
   payload = {
     "iat": int(time.time()),
     "jti": str(uuid.uuid1()),
-    "name": user.name,
-    "email": user.email
+    "name": request.user.get_full_name(),
+    "email": request.user.email
   }
 
   subdomain  = "{my zendesk subdomain}"
