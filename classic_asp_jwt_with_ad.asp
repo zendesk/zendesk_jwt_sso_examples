@@ -30,25 +30,43 @@
     sOrganizationField  = ""
     sTagsField          = ""
     sPhotoUrlField      = ""
+    
+
+    ' Debug Mode Switch
+    ' Set this to True to turn on Debug Mode. Set it to False to use in production.
+
+    Dim dM
+    dM = False
 
     Set dAttributes = GetAuthenticatedUser()
 
     If dAttributes Is Nothing Then
-      Response.Write("Could not login to Zendesk. Please contact your administrator.")
-      Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
+      If dM Then
+        Response.Write("Could not login to Zendesk. Please contact your administrator.")
+        Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
 
-      Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
+        Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
+      Else
+        Response.Status = "401 Unauthorized"
+      End If
     ElseIf dAttributes("email") = "" Then
-      Response.Write("Could not login to Zendesk. Please contact your administrator.")
-      Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
+      If dM Then
+        Response.Write("Could not login to Zendesk. Please contact your administrator.")
+        Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
 
-      Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
+        Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
+      Else
+        Response.Write("User does not have an email address.")
+      End If
     Else
       sParameter   = JWTTokenForUser(dAttributes)
       sRedirectUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
 
-      Debug "Redirecting to " & sRedirectUrl
-      'Response.redirect sRedirectUrl
+      If dM Then
+        Debug "Redirecting to " & sRedirectUrl
+      Else
+        Response.redirect sRedirectUrl
+      End If
     End If
 %>
 
