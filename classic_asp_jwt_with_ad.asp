@@ -34,7 +34,6 @@
 
     ' Debug Mode Switch
     ' Set this to True to turn on Debug Mode. Set it to False to use in production.
-
     Dim dM
     dM = False
 
@@ -50,23 +49,16 @@
         Response.Status = "401 Unauthorized"
       End If
     ElseIf dAttributes("email") = "" Then
-      If dM Then
-        Response.Write("Could not login to Zendesk. Please contact your administrator.")
-        Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
+      Response.Write("Could not login to Zendesk. Please contact your administrator.")
+      Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
 
-        Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
-      Else
-        Response.Write("User does not have an email address.")
-      End If
+      Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
     Else
       sParameter   = JWTTokenForUser(dAttributes)
       sRedirectUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
 
-      If dM Then
-        Debug "Redirecting to " & sRedirectUrl
-      Else
-        Response.redirect sRedirectUrl
-      End If
+      Debug "Redirecting to " & sRedirectUrl
+      Response.redirect sRedirectUrl
     End If
 %>
 
@@ -82,9 +74,9 @@ Function JWTTokenForUser(dAttributes)
   Dim i, aKeys
   aKeys = dAttributes.keys
 
-  'For i = 0 To aKeys.Count-1
-    'Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
-  'Next
+  For i = 0 To aKeys.Count-1
+    Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
+  Next
 
   JWTTokenForUser = JWTEncode(dAttributes, sKey)
 End Function
@@ -100,16 +92,13 @@ Function GetAuthenticatedUser()
 
   ' Retrieve authenticated user
   sUsername = split(Request.ServerVariables("LOGON_USER"),"\")(1)
-  If dM Then
-    Debug Request.ServerVariables("LOGON_USER") & " - should be of the form DOMAIN\username - if blank, your IIS probably allows anonymous access to this file."
-  End If
+  Debug Request.ServerVariables("LOGON_USER") & " - should be of the form DOMAIN\username - if blank, your IIS probably allows anonymous access to this file."
+
   Set rootDSE = GetObject("LDAP://RootDSE")
   Set oConn   = CreateObject("ADODB.Connection")
 
   sDomainContainer = rootDSE.Get("defaultNamingContext")
-  If dM Then
-    Debug "DomainContainer: " & sDomainContainer
-  End If
+  Debug "DomainContainer: " & sDomainContainer
 
   oConn.Provider = "ADSDSOObject"
   oConn.properties("user id")  = sLdapReaderUsername
