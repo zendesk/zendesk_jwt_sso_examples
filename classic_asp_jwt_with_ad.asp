@@ -38,7 +38,7 @@
       Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
 
       Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
-    ElseIf dAttributes("mail") = ""
+    ElseIf dAttributes("email") = "" Then
       Response.Write("Could not login to Zendesk. Please contact your administrator.")
       Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
 
@@ -119,32 +119,31 @@ Function GetAuthenticatedUser()
   If Not userRS.EOF and not err then
     Set dAttributes = Server.CreateObject("Scripting.Dictionary")
 
-    dAttributes.Add "name", userRS("displayName")
-    dAttributes.Add "email", userRS("mail")
+    dAttributes.Add "name", userRS("displayName").Value
+    dAttributes.Add "email", userRS("mail").Value
 
     If sExternalIdField > "" Then
-      dAttributes.Add "external_id", userRS(sExternalIdField)
+      dAttributes.Add "external_id", userRS(sExternalIdField).Value
     End If
 
     If sOrganizationField > "" Then
-      dAttributes.Add "organization", userRS(sOrganizationField)
+      dAttributes.Add "organization", userRS(sOrganizationField).Value
     End If
 
     If sTagsField > "" Then
-      dAttributes.Add "tags", userRS(sTagsField)
+      dAttributes.Add "tags", userRS(sTagsField).Value
     End If
 
     If sPhotoUrlField > "" Then
-      dAttributes.Add "remote_photo_url", userRS(sPhotoUrlField)
+      dAttributes.Add "remote_photo_url", userRS(sPhotoUrlField).Value
     End If
 
-    GetAuthenticatedUser = dAttributes
+    Set GetAuthenticatedUser = dAttributes
   else
-    GetAuthenticatedUser = Nothing
+    Set GetAuthenticatedUser = Nothing
   end if
 
   userRS.Close
   oConn.Close
 End Function
 %>
-
