@@ -90,7 +90,7 @@ Function JWTTokenForUser(dAttributes)
 End Function
 
 Function Debug(sMessage)
-  If request.QueryString("debug") = "1" Then
+  If dM Then
     response.Write("[DEBUG] " & sMessage & "<br/>")
   End If
 End Function
@@ -100,13 +100,16 @@ Function GetAuthenticatedUser()
 
   ' Retrieve authenticated user
   sUsername = split(Request.ServerVariables("LOGON_USER"),"\")(1)
-  Debug Request.ServerVariables("LOGON_USER") & " - should be of the form DOMAIN\username - if blank, your IIS probably allows anonymous access to this file."
-
+  If dM Then
+    Debug Request.ServerVariables("LOGON_USER") & " - should be of the form DOMAIN\username - if blank, your IIS probably allows anonymous access to this file."
+  End If
   Set rootDSE = GetObject("LDAP://RootDSE")
   Set oConn   = CreateObject("ADODB.Connection")
 
   sDomainContainer = rootDSE.Get("defaultNamingContext")
-  Debug "DomainContainer: " & sDomainContainer
+  If dM Then
+    Debug "DomainContainer: " & sDomainContainer
+  End If
 
   oConn.Provider = "ADSDSOObject"
   oConn.properties("user id")  = sLdapReaderUsername
