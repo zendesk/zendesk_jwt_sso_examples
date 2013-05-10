@@ -21,8 +21,8 @@
     sSubdomain = ""
 
     ' Credentials for a domain user for LDAP access
-    sLdapReaderUsername = "domain\username"
-    sLdapReaderPassword = "password"
+    sLdapReaderUsername = ""
+    sLdapReaderPassword = ""
 
     ' The below 4 fields can optionally be sent to Zendesk. In order to do so, set each variable to the field
     ' name on the local user record. E.g. sExternalIdField = "sAMAccountName" and so forth.
@@ -48,7 +48,7 @@
       sRedirectUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
 
       Debug "Redirecting to " & sRedirectUrl
-      Response.redirect sRedirectUrl
+      'Response.redirect sRedirectUrl
     End If
 %>
 
@@ -64,9 +64,9 @@ Function JWTTokenForUser(dAttributes)
   Dim i, aKeys
   aKeys = dAttributes.keys
 
-  For i = 0 To aKeys.Count-1
-    Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
-  Next
+  'For i = 0 To aKeys.Count-1
+    'Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
+  'Next
 
   JWTTokenForUser = JWTEncode(dAttributes, sKey)
 End Function
