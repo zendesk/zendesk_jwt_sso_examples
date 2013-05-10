@@ -40,14 +40,10 @@
     Set dAttributes = GetAuthenticatedUser()
 
     If dAttributes Is Nothing Then
-      If dM Then
-        Response.Write("Could not login to Zendesk. Please contact your administrator.")
-        Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
-
-        Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
-      Else
-        Response.Status = "401 Unauthorized"
-      End If
+      Response.Write("Could not login to Zendesk. Please contact your administrator.")
+      Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
+      
+      Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
     ElseIf dAttributes("email") = "" Then
       Response.Write("Could not login to Zendesk. Please contact your administrator.")
       Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
