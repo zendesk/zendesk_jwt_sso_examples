@@ -21,8 +21,8 @@
     sSubdomain = ""
 
     ' Credentials for a domain user for LDAP access
-    sLdapReaderUsername = "domain\username"
-    sLdapReaderPassword = "password"
+    sLdapReaderUsername = ""
+    sLdapReaderPassword = ""
 
     ' The below 4 fields can optionally be sent to Zendesk. In order to do so, set each variable to the field
     ' name on the local user record. E.g. sExternalIdField = "sAMAccountName" and so forth.
@@ -30,25 +30,31 @@
     sOrganizationField  = ""
     sTagsField          = ""
     sPhotoUrlField      = ""
+    
+
+    ' Debug Mode Switch
+    ' Set this to True to turn on Debug Mode. Set it to False to use in production.
+    Dim dM
+    dM = False
 
     Set dAttributes = GetAuthenticatedUser()
 
     If dAttributes Is Nothing Then
-      Response.Write("Could not login to Zendesk. Please contact your administrator.")
-      Response.Write("Account '" & Request.ServerVariables("LOGON_USER") & "' not found.")
-
+      Debug "Could not login to Zendesk. Please contact your administrator."
+      Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
+      
       Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
     ElseIf dAttributes("email") = "" Then
-      Response.Write("Could not login to Zendesk. Please contact your administrator.")
-      Response.Write("User '" & Request.ServerVariables("LOGON_USER") & "' has no email.")
-
+      Debug "Could not login to Zendesk. Please contact your administrator.")
       Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
     Else
       sParameter   = JWTTokenForUser(dAttributes)
       sRedirectUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
-
-      Debug "Redirecting to " & sRedirectUrl
-      Response.redirect sRedirectUrl
+      If dM Then
+        Debug "Redirecting to " & sRedirectUrl
+      Else
+        Response.redirect sRedirectUrl
+      End If
     End If
 %>
 
@@ -72,7 +78,7 @@ Function JWTTokenForUser(dAttributes)
 End Function
 
 Function Debug(sMessage)
-  If request.QueryString("debug") = "1" Then
+  If dM Then
     response.Write("[DEBUG] " & sMessage & "<br/>")
   End If
 End Function
