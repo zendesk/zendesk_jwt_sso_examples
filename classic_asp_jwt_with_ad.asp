@@ -30,7 +30,7 @@
     sOrganizationField  = ""
     sTagsField          = ""
     sPhotoUrlField      = ""
-    
+
 
     ' Debug Mode Switch
     ' Set this to True to turn on Debug Mode. Set it to False to use in production.
@@ -40,12 +40,10 @@
     Set dAttributes = GetAuthenticatedUser()
 
     If dAttributes Is Nothing Then
-      Debug "Could not login to Zendesk. Please contact your administrator."
-      Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
-      
+      Response.Write("Could not login to Zendesk. Please contact your administrator.")
       Debug "Account '" & Request.ServerVariables("LOGON_USER") & "' not found."
     ElseIf dAttributes("email") = "" Then
-      Debug "Could not login to Zendesk. Please contact your administrator.")
+      Response.write("Could not login to Zendesk. Please contact your administrator.")
       Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
     Else
       sParameter   = JWTTokenForUser(dAttributes)
