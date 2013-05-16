@@ -4,6 +4,10 @@
   commons-codec.jar from http://commons.apache.org/proper/commons-codec/
   json-smart.jar from https://code.google.com/p/json-smart/
   nimbus-jose-jwt.jar from https://bitbucket.org/nimbusds/nimbus-jose-jwt/overview
+  
+  Because of this [1] issue in nimbus-jose-jwt, please make sure to use a 
+  version >= 2.13.1 as Zendesk expects seconds in the iat parameter
+  [1]: https://bitbucket.org/nimbusds/nimbus-jose-jwt/issue/35/jwtclaimsset-milliseconds-vs-seconds-issue
 */
 
 package com.zendesk.login;
