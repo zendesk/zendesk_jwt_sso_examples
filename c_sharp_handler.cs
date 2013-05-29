@@ -15,8 +15,12 @@ namespace Zendesk
 
         public void ProcessRequest(HttpContext context)
         {
+
+        	TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+            int timestamp  = (int) t.TotalSeconds;
+
             var payload = new Dictionary<string, object>() {
-                { "iat", (new DateTime()).ToLongTimeString() },
+                { "iat", timestamp },
                 { "jti", System.Guid.NewGuid() }
                 // { "name", currentUser.name },
                 // { "email", currentUser.email }
