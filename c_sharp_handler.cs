@@ -15,8 +15,7 @@ namespace Zendesk
 
         public void ProcessRequest(HttpContext context)
         {
-
-        	TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+            TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
             int timestamp  = (int) t.TotalSeconds;
 
             var payload = new Dictionary<string, object>() {
