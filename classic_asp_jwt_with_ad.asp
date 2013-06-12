@@ -68,7 +68,7 @@ Function JWTTokenForUser(dAttributes)
   Dim i, aKeys
   aKeys = dAttributes.keys
 
-  For i = 0 To aKeys.Count-1
+  For i = 0 To dAttributes.Count-1
     Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
   Next
 
