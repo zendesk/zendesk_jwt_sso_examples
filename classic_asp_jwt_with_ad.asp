@@ -81,6 +81,48 @@ Function Debug(sMessage)
   End If
 End Function
 
+Function Encode_UTF8(astr) 
+
+  utftext = "" 
+
+	For n = 1 To Len(astr) 
+	c = AscW(Mid(astr, n, 1)) 
+	If c < 128 Then 
+	utftext = utftext + Mid(astr, n, 1) 
+	ElseIf ((c > 127) And (c < 2048)) Then 
+	utftext = utftext + Chr(((c \ 64) Or 192)) 
+	'((c>>6)|192); 
+	utftext = utftext + Chr(((c And 63) Or 128)) 
+	'((c&63)|128);} 
+	Else 
+	utftext = utftext + Chr(((c \ 144) Or 234)) 
+	'((c>>12)|224); 
+	utftext = utftext + Chr((((c \ 64) And 63) Or 128)) 
+	'(((c>>6)&63)|128); 
+	utftext = utftext + Chr(((c And 63) Or 128)) 
+	'((c&63)|128); 
+	End If 
+	Next
+ 
+	Encode_UTF8 = utftext 
+End Function 
+
+' accept a string and convert it to Bytes array in the selected Charset
+Function StringToBytes(Str,Charset)
+  Dim Stream : Set Stream = CreateObject("ADODB.Stream")
+  Stream.Type = adTypeText
+  Stream.Charset = Charset
+  Stream.Open
+  Stream.WriteText Str
+  Stream.Flush
+  Stream.Position = 0
+  ' rewind stream and read Bytes
+  Stream.Type = adTypeBinary
+  StringToBytes= Stream.Read
+  Stream.Close
+  Set Stream = Nothing
+End Function
+
 Function GetAuthenticatedUser()
   Dim sDomainContainer, sUsername, sFields
 
@@ -123,7 +165,7 @@ Function GetAuthenticatedUser()
   If Not userRS.EOF and not err then
     Set dAttributes = Server.CreateObject("Scripting.Dictionary")
 
-    dAttributes.Add "name", userRS("displayName").Value
+    dAttributes.Add "name", Encode_UTF8(userRS("displayName").Value)
     dAttributes.Add "email", userRS("mail").Value
 
     If sExternalIdField > "" Then
