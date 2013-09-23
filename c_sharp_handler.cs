@@ -20,7 +20,7 @@ namespace Zendesk
 
             var payload = new Dictionary<string, object>() {
                 { "iat", timestamp },
-                { "jti", System.Guid.NewGuid() }
+                { "jti", System.Guid.NewGuid().ToString() }
                 // { "name", currentUser.name },
                 // { "email", currentUser.email }
             };
