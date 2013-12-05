@@ -2,6 +2,7 @@
 # in your Gemfile, you can read more about that gem at https://github.com/progrium/ruby-jwt.
 # Assuming that you've set your shared secret and Zendesk subdomain in the environment, you
 # can use Zendesk SSO from your controller like this example.
+require 'securerandom' unless defined?(SecureRandom)
 
 class ZendeskSessionController < ApplicationController
   # Configuration
@@ -23,7 +24,7 @@ class ZendeskSessionController < ApplicationController
     # This is the meat of the business, set up the parameters you wish
     # to forward to Zendesk. All parameters are documented in this page.
     iat = Time.now.to_i
-    jti = "#{iat}/#{rand(36**64).to_s(36)}"
+    jti = "#{iat}/#{SecureRandom.hex(18)}"
 
     payload = JWT.encode({
       :iat   => iat, # Seconds since epoch, determine when this token is stale
