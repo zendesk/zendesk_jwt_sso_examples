@@ -64,6 +64,13 @@ public class JWT extends HttpServlet {
     // Serialise to JWT compact form
     String jwtString = jwsObject.serialize();
 
-    response.sendRedirect("https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString);
+    String redirectUrl = "https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString;
+
+    String returnTo = request.getParameter("return_to");
+    if (returnTo != null) {
+        redirectUrl += "&return_to=" + returnTo;
+    }
+
+    response.sendRedirect(redirectUrl);
   }
 }
