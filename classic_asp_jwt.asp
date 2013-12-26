@@ -16,5 +16,11 @@ dAttributes.Add "email", "someone@example.com"
 
 sParameter = JWTEncode(dAttributes, sKey)
 
-Response.redirect "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
+sUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
+
+if not isempty(Request.QueryString("return_to")) then
+  sURL = sURL & "&return_to=" & Server.URLEncode(Request.QueryString("return_to"))
+end if
+
+Response.redirect sUrl
 %>
