@@ -12,21 +12,23 @@
 
 package com.zendesk.login;
 
-import java.util.Date;
-import java.util.UUID;
-
-import java.io.IOException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.*;
-import com.nimbusds.jose.util.*;
-import com.nimbusds.jwt.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.UUID;
 
 public class JWT extends HttpServlet {
   private static final String SHARED_KEY = "{my zendesk token}";
@@ -64,6 +66,22 @@ public class JWT extends HttpServlet {
     // Serialise to JWT compact form
     String jwtString = jwsObject.serialize();
 
-    response.sendRedirect("https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString);
+    String redirectUrl = "https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString;
+
+    String returnTo = request.getParameter("return_to");
+    if (returnTo != null) {
+        redirectUrl += "&return_to=" + encode(returnTo);
+    }
+
+    response.sendRedirect(redirectUrl);
+  }
+
+  private static String encode(String url) {
+    try {
+      return URLEncoder.encode(url, "UTF-8");
+    } catch (UnsupportedEncodingException ignore) {
+      System.err.println("UTF-8 is not supported!");
+      return url;
+    }
   }
 }
