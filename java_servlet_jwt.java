@@ -79,7 +79,7 @@ public class JWT extends HttpServlet {
   private static String encode(String url) {
     try {
       return URLEncoder.encode(url, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException ignore) {
       System.err.println("UTF-8 is not supported!");
       return url;
     }
