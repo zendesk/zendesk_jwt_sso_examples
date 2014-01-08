@@ -28,6 +28,12 @@ namespace Zendesk
             string token = JWT.JsonWebToken.Encode(payload, SHARED_KEY, JWT.JwtHashAlgorithm.HS256);
             string redirectUrl = "https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + token;
 
+            string returnTo = context.Request.QueryString["return_to"];
+
+            if(return_to != null) {
+              redirectUrl += "&return_to=" + HttpUtility.UrlEncode(returnTo);
+            }
+
             context.Response.Redirect(redirectUrl);
         }
 

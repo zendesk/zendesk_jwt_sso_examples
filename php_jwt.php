@@ -19,7 +19,12 @@ $token = array(
 );
 
 $jwt = JWT::encode($token, $key);
+$location = "https://" . $subdomain . ".zendesk.com/access/jwt?jwt=" . $jwt;
+
+if(isset($_GET["return_to"])) {
+  $location .= "&return_to=" . urlencode($_GET["return_to"]);
+}
 
 // Redirect
-header("Location: https://" . $subdomain . ".zendesk.com/access/jwt?jwt=" . $jwt);
+header("Location: " . $location);
 ?>
