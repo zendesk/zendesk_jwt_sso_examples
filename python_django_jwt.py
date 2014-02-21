@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 import time
 import jwt
 import uuid
+import urllib
 
 def index(request):
 
