@@ -30,7 +30,7 @@ namespace Zendesk
 
             string returnTo = context.Request.QueryString["return_to"];
 
-            if(return_to != null) {
+            if(returnTo != null) {
               redirectUrl += "&return_to=" + HttpUtility.UrlEncode(returnTo);
             }
 
