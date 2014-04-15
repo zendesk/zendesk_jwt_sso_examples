@@ -46,9 +46,9 @@
     ' To use custom user fields, specify the 'Field key' value from Zendesk with sUserFieldKey#, and set sUserFieldValue# 
     ' to the field name on the local user record.  For more info, see: https://support.zendesk.com/entries/24740352
     ' To add additional custom user fields, add additional entries here as well as both commented areas in GetAuthenticatedUser()
-    sUserFieldKey1		= ""
+    sUserFieldKey1	= ""
     sUserFieldValue1	= ""
-    sUserFieldKey2		= ""
+    sUserFieldKey2	= ""
     sUserFieldValue2	= ""
 
     ' Debug Mode Switch
