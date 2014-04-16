@@ -38,7 +38,7 @@
     ' If the sRoleField is set to 'agent', you can specify a custom role ID (Enterprise only) with the below field
     sCustomRoleIDField  = ""
 
-    ' Use sLocaleField for end-users, and sLocaleIDField.  Must be a valid integer from the available locales in your Zendesk.  
+    ' Use sLocaleField for end-users, and sLocaleIDField for agents.  Must be a valid integer from the available locales in your Zendesk.  
     ' For a list of valid locales and localeIDs, see: http://developer.zendesk.com/documentation/rest_api/locales.html 
     sLocaleField        = ""
     sLocaleIDField      = ""
