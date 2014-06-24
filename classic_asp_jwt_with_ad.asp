@@ -263,4 +263,4 @@ Function GetAuthenticatedUser()
   userRS.Close
   oConn.Close
 End Function
-%>
+%> 
