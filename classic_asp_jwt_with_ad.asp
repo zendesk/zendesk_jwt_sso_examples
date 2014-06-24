@@ -2,8 +2,8 @@
 <%
     Dim sKey, sSubdomain, sLdapReaderUsername, sLdapReaderPassword, sLoginErrorMessage
     Dim dAttributes, sParameter, sRedirectUrl, sExternalIdField, sOrganizationField, sTagsField
-	Dim sPhotoURLField, sPhoneField, sRoleField, sCustomRoleIDField, sLocaleField, sLocaleIDField
-	Dim dUserFields, sUserFieldKey1, sUserFieldValue1, sUserFieldKey2, sUserFieldValue2
+    Dim sPhotoURLField, sPhoneField, sRoleField, sCustomRoleIDField, sLocaleField, sLocaleIDField
+    Dim dUserFields, sUserFieldKey1, sUserFieldValue1, sUserFieldKey2, sUserFieldValue2
 
     ' This script relies on the classic ASP implementation from https://github.com/zendesk/classic_asp_jwt
     ' Once you have that in place, proceed to configure the script as instructed in the documentation below
@@ -77,6 +77,7 @@
 
 <%
 Function JWTTokenForUser(dAttributes, dUserFields)
+  Dim i, aAttributeKeys, aUserFieldKeys
   dAttributes.Add "jti", UniqueString
   dAttributes.Add "iat", SecsSinceEpoch
 
@@ -84,7 +85,6 @@ Function JWTTokenForUser(dAttributes, dUserFields)
     dAttributes.Add "return_to", Request.QueryString("return_to")
   End If
 
-  Dim i, aAttributeKeys, aUserFieldKeys
   aAttributeKeys = dAttributes.keys
 
   For i = 0 To dAttributes.Count-1
@@ -92,12 +92,12 @@ Function JWTTokenForUser(dAttributes, dUserFields)
   Next
 
   If dUserFields.Count = 0 Then
-  Debug("'user_fields' not in use")
+    Debug("'user_fields' not in use")
   Else
     aUserFieldKeys = dUserFields.keys
-  For i = 0 to dUserFields.Count-1
-    Debug("Custom User Field " & aUserFieldKeys(i) & ": " & dUserFields(aUserFieldKeys(i)))
-  Next
+    For i = 0 to dUserFields.Count-1
+      Debug("Custom User Field " & aUserFieldKeys(i) & ": " & dUserFields(aUserFieldKeys(i)))
+    Next
   End If
 
   JWTTokenForUser = JWTEncode(dAttributes, dUserFields, sKey)
@@ -108,22 +108,22 @@ Function Encode_UTF8(astr)
   utftext = ""
   
   For n = 1 To Len(astr)
-  c = AscW(Mid(astr, n, 1))
-  If c < 128 Then
-  utftext = utftext + Mid(astr, n, 1)
-  ElseIf ((c > 127) And (c < 2048)) Then
-  utftext = utftext + Chr(((c \ 64) Or 192))
-  '((c>>6)|192);
-  utftext = utftext + Chr(((c And 63) Or 128))
-  '((c&63)|128);}
-  Else
-  utftext = utftext + Chr(((c \ 144) Or 234))
-  '((c>>12)|224);
-  utftext = utftext + Chr((((c \ 64) And 63) Or 128))
-  '(((c>>6)&63)|128);
-  utftext = utftext + Chr(((c And 63) Or 128))
-  '((c&63)|128);
-  End If
+    c = AscW(Mid(astr, n, 1))
+    If c < 128 Then
+      utftext = utftext + Mid(astr, n, 1)
+    ElseIf ((c > 127) And (c < 2048)) Then
+      utftext = utftext + Chr(((c \ 64) Or 192))
+      '((c>>6)|192);
+      utftext = utftext + Chr(((c And 63) Or 128))
+      '((c&63)|128);}
+    Else
+      utftext = utftext + Chr(((c \ 144) Or 234))
+      '((c>>12)|224);
+      utftext = utftext + Chr((((c \ 64) And 63) Or 128))
+      '(((c>>6)&63)|128);
+      utftext = utftext + Chr(((c And 63) Or 128))
+      '((c&63)|128);
+    End If
   Next
 
   Encode_UTF8 = utftext
@@ -191,12 +191,12 @@ Function GetAuthenticatedUser()
     sFields = sFields & "," & sLocaleIDField
   End If
   
- ' If you need more custom user fields, add additional entries below as well as above in the settings.
-   If sUserFieldValue1 > "" Then
+  ' If you need more custom user fields, add additional entries below as well as above in the settings.
+  If sUserFieldValue1 > "" Then
     sFields = sFields & "," & sUserFieldValue1
   End If
   
-   If sUserFieldValue2 > "" Then
+  If sUserFieldValue2 > "" Then
     sFields = sFields & "," & sUserFieldValue2
   End If  
   
@@ -205,7 +205,7 @@ Function GetAuthenticatedUser()
 
   If Not userRS.EOF and not err then
     Set dAttributes = Server.CreateObject("Scripting.Dictionary")
-  Set dUserFields = Server.CreateObject("Scripting.Dictionary")
+    Set dUserFields = Server.CreateObject("Scripting.Dictionary")
 
     dAttributes.Add "name", Encode_UTF8(userRS("displayName").Value)
     dAttributes.Add "email", userRS("mail").Value
@@ -251,14 +251,14 @@ Function GetAuthenticatedUser()
       dUserFields.Add Encode_UTF8(sUserFieldKey1), Encode_UTF8(userRS(sUserFieldValue1).Value)
     End If
 
-  If sUserFieldKey2 > "" And sUserFieldValue2 > "" Then
+    If sUserFieldKey2 > "" And sUserFieldValue2 > "" Then
       dUserFields.Add Encode_UTF8(sUserFieldKey2), Encode_UTF8(userRS(sUserFieldValue2).Value)
     End If
 
     Set GetAuthenticatedUser = dAttributes
-  else
+  Else
     Set GetAuthenticatedUser = Nothing
-  end if
+  End if
 
   userRS.Close
   oConn.Close
