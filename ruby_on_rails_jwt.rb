@@ -26,8 +26,8 @@ class ZendeskSessionController < ApplicationController
     iat = Time.now.to_i
     jti = "#{iat}/#{SecureRandom.hex(18)}"
     # Tags will be overwritten, and you need to pass a ruby Array, not a json array like the documentation states
-    # if you need to get a list of tags, use the seach API:
-    # https://developer.zendesk.com/rest_api/docs/core/search
+    # if you need to get a list of tags, use the tags API:
+    # https://developer.zendesk.com/rest_api/docs/core/tags
     taglist = ['tag1', 'tag2']  
     
     payload = JWT.encode({
