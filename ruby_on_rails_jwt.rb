@@ -25,12 +25,17 @@ class ZendeskSessionController < ApplicationController
     # to forward to Zendesk. All parameters are documented in this page.
     iat = Time.now.to_i
     jti = "#{iat}/#{SecureRandom.hex(18)}"
-
+    # Tags will be overwritten, and you need to pass a ruby Array, not a json array like the documentation states
+    # if you need to get a list of tags, use the seach API:
+    # https://developer.zendesk.com/rest_api/docs/core/search
+    taglist = ['tag1', 'tag2']  
+    
     payload = JWT.encode({
       :iat   => iat, # Seconds since epoch, determine when this token is stale
       :jti   => jti, # Unique token id, helps prevent replay attacks
       :name  => user.name,
       :email => user.email,
+      :tags  => tags,
     }, ZENDESK_SHARED_SECRET)
 
     redirect_to zendesk_sso_url(payload)
