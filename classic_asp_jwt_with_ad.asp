@@ -75,6 +75,32 @@ Function JWTTokenForUser(dAttributes)
   JWTTokenForUser = JWTEncode(dAttributes, sKey)
 End Function
 
+Function Encode_UTF8(astr)
+  
+  utftext = ""
+  
+  For n = 1 To Len(astr)
+  c = AscW(Mid(astr, n, 1))
+  If c < 128 Then
+  utftext = utftext + Mid(astr, n, 1)
+  ElseIf ((c > 127) And (c < 2048)) Then
+  utftext = utftext + Chr(((c \ 64) Or 192))
+  '((c>>6)|192);
+  utftext = utftext + Chr(((c And 63) Or 128))
+  '((c&63)|128);}
+  Else
+  utftext = utftext + Chr(((c \ 144) Or 234))
+  '((c>>12)|224);
+  utftext = utftext + Chr((((c \ 64) And 63) Or 128))
+  '(((c>>6)&63)|128);
+  utftext = utftext + Chr(((c And 63) Or 128))
+  '((c&63)|128);
+  End If
+  Next
+
+  Encode_UTF8 = utftext
+End Function
+
 Function Debug(sMessage)
   If dM Then
     response.Write("[DEBUG] " & sMessage & "<br/>")
@@ -123,7 +149,7 @@ Function GetAuthenticatedUser()
   If Not userRS.EOF and not err then
     Set dAttributes = Server.CreateObject("Scripting.Dictionary")
 
-    dAttributes.Add "name", userRS("displayName").Value
+    dAttributes.Add "name", Encode_UTF8(userRS("displayName").Value)
     dAttributes.Add "email", userRS("mail").Value
 
     If sExternalIdField > "" Then
@@ -131,7 +157,7 @@ Function GetAuthenticatedUser()
     End If
 
     If sOrganizationField > "" Then
-      dAttributes.Add "organization", userRS(sOrganizationField).Value
+      dAttributes.Add "organization", Encode_UTF8(userRS(sOrganizationField).Value)
     End If
 
     If sTagsField > "" Then
