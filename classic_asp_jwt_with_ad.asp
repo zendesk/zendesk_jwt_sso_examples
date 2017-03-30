@@ -1,7 +1,9 @@
 <!--#include file="jwt.asp" -->
 <%
     Dim sKey, sSubdomain, sLdapReaderUsername, sLdapReaderPassword, sLoginErrorMessage
-    Dim dAttributes, sParameter, sRedirectUrl, sExternalIdField, sOrganizationField, sTagsField, sPhotoUrlField
+    Dim dAttributes, sParameter, sRedirectUrl, sExternalIdField, sOrganizationField, sTagsField
+    Dim sPhotoURLField, sPhoneField, sRoleField, sCustomRoleIDField, sLocaleField, sLocaleIDField
+    Dim dUserFields, sUserFieldKey1, sUserFieldValue1, sUserFieldKey2, sUserFieldValue2
 
     ' This script relies on the classic ASP implementation from https://github.com/zendesk/classic_asp_jwt
     ' Once you have that in place, proceed to configure the script as instructed in the documentation below
@@ -24,13 +26,30 @@
     sLdapReaderUsername = ""
     sLdapReaderPassword = ""
 
-    ' The below 4 fields can optionally be sent to Zendesk. In order to do so, set each variable to the field
+    ' The below fields can OPTIONALLY be sent to Zendesk. In order to do so, set each variable to the field
     ' name on the local user record. E.g. sExternalIdField = "sAMAccountName" and so forth.
     sExternalIdField    = ""
     sOrganizationField  = ""
     sTagsField          = ""
     sPhotoUrlField      = ""
+    sPhoneField         = ""
+    sRoleField          = ""
 
+    ' If the sRoleField is set to 'agent', you can specify a custom role ID (Enterprise only) with the below field
+    sCustomRoleIDField  = ""
+
+    ' Use sLocaleField for end-users, and sLocaleIDField for agents.  Must be a valid integer from the available locales in your Zendesk.  
+    ' For a list of valid locales and localeIDs, see: http://developer.zendesk.com/documentation/rest_api/locales.html 
+    sLocaleField        = ""
+    sLocaleIDField      = ""
+
+    ' To use custom user fields, specify the 'Field key' value from Zendesk with sUserFieldKey#, and set sUserFieldValue# 
+    ' to the field name on the local user record.  For more info, see: https://support.zendesk.com/entries/24740352
+    ' To add additional custom user fields, add additional entries here as well as both commented areas in GetAuthenticatedUser()
+    sUserFieldKey1	= ""
+    sUserFieldValue1	= ""
+    sUserFieldKey2	= ""
+    sUserFieldValue2	= ""
 
     ' Debug Mode Switch
     ' Set this to True to turn on Debug Mode. Set it to False to use in production.
@@ -46,7 +65,7 @@
       Response.write("Could not login to Zendesk. Please contact your administrator.")
       Debug "User '" & Request.ServerVariables("LOGON_USER") & "' has no email."
     Else
-      sParameter   = JWTTokenForUser(dAttributes)
+      sParameter   = JWTTokenForUser(dAttributes, dUserFields)
       sRedirectUrl = "https://" & sSubdomain & ".zendesk.com/access/jwt?jwt=" & sParameter
       If dM Then
         Debug "Redirecting to " & sRedirectUrl
@@ -57,7 +76,8 @@
 %>
 
 <%
-Function JWTTokenForUser(dAttributes)
+Function JWTTokenForUser(dAttributes, dUserFields)
+  Dim i, aAttributeKeys, aUserFieldKeys
   dAttributes.Add "jti", UniqueString
   dAttributes.Add "iat", SecsSinceEpoch
 
@@ -65,14 +85,48 @@ Function JWTTokenForUser(dAttributes)
     dAttributes.Add "return_to", Request.QueryString("return_to")
   End If
 
-  Dim i, aKeys
-  aKeys = dAttributes.keys
+  aAttributeKeys = dAttributes.keys
 
   For i = 0 To dAttributes.Count-1
-    Debug("Attribute " & aKeys(i) & ": " & dAttributes(aKeys(i)))
+    Debug("Attribute " & aAttributeKeys(i) & ": " & dAttributes(aAttributeKeys(i)))
   Next
 
-  JWTTokenForUser = JWTEncode(dAttributes, sKey)
+  If dUserFields.Count = 0 Then
+    Debug("'user_fields' not in use")
+  Else
+    aUserFieldKeys = dUserFields.keys
+    For i = 0 to dUserFields.Count-1
+      Debug("Custom User Field " & aUserFieldKeys(i) & ": " & dUserFields(aUserFieldKeys(i)))
+    Next
+  End If
+
+  JWTTokenForUser = JWTEncode(dAttributes, dUserFields, sKey)
+End Function
+
+Function Encode_UTF8(astr)
+  
+  utftext = ""
+  
+  For n = 1 To Len(astr)
+    c = AscW(Mid(astr, n, 1))
+    If c < 128 Then
+      utftext = utftext + Mid(astr, n, 1)
+    ElseIf ((c > 127) And (c < 2048)) Then
+      utftext = utftext + Chr(((c \ 64) Or 192))
+      '((c>>6)|192);
+      utftext = utftext + Chr(((c And 63) Or 128))
+      '((c&63)|128);}
+    Else
+      utftext = utftext + Chr(((c \ 144) Or 234))
+      '((c>>12)|224);
+      utftext = utftext + Chr((((c \ 64) And 63) Or 128))
+      '(((c>>6)&63)|128);
+      utftext = utftext + Chr(((c And 63) Or 128))
+      '((c&63)|128);
+    End If
+  Next
+
+  Encode_UTF8 = utftext
 End Function
 
 Function Debug(sMessage)
@@ -116,14 +170,44 @@ Function GetAuthenticatedUser()
   If sPhotoUrlField > "" Then
     sFields = sFields & "," & sPhotoUrlField
   End If
+  
+  If sPhoneField > "" Then
+    sFields = sFields & "," & sPhoneField
+  End If
+  
+  If sRoleField > "" Then
+    sFields = sFields & "," & sRoleField
+  End If
+  
+  If sCustomRoleIDField > "" Then
+    sFields = sFields & "," & sCustomRoleIDField
+  End If
 
+  If sLocaleField > "" Then
+    sFields = sFields & "," & sLocaleField
+  End If
+  
+  If sLocaleIDField > "" Then
+    sFields = sFields & "," & sLocaleIDField
+  End If
+  
+  ' If you need more custom user fields, add additional entries below as well as above in the settings.
+  If sUserFieldValue1 > "" Then
+    sFields = sFields & "," & sUserFieldValue1
+  End If
+  
+  If sUserFieldValue2 > "" Then
+    sFields = sFields & "," & sUserFieldValue2
+  End If  
+  
   sQuery  = "<LDAP://" & sDomainContainer & ">;(sAMAccountName=" & sUsername & ");adspath," & sFields & ";subtree"
   Set userRS = oConn.Execute(sQuery)
 
   If Not userRS.EOF and not err then
     Set dAttributes = Server.CreateObject("Scripting.Dictionary")
+    Set dUserFields = Server.CreateObject("Scripting.Dictionary")
 
-    dAttributes.Add "name", userRS("displayName").Value
+    dAttributes.Add "name", Encode_UTF8(userRS("displayName").Value)
     dAttributes.Add "email", userRS("mail").Value
 
     If sExternalIdField > "" Then
@@ -131,7 +215,7 @@ Function GetAuthenticatedUser()
     End If
 
     If sOrganizationField > "" Then
-      dAttributes.Add "organization", userRS(sOrganizationField).Value
+      dAttributes.Add "organization", Encode_UTF8(userRS(sOrganizationField).Value)
     End If
 
     If sTagsField > "" Then
@@ -142,10 +226,39 @@ Function GetAuthenticatedUser()
       dAttributes.Add "remote_photo_url", userRS(sPhotoUrlField).Value
     End If
 
+    If sPhoneField > "" Then
+      dAttributes.Add "phone", userRS(sPhoneField).Value
+    End If
+
+    If sRoleField > "" Then
+      dAttributes.Add "role", userRS(sRoleField).Value
+    End If
+
+    If sCustomRoleIDField > "" Then
+      dAttributes.Add "custom_role_id", userRS(sCustomRoleIDField).Value
+    End If
+
+    If sLocaleField > "" Then
+      dAttributes.Add "locale", userRS(sLocaleField).Value
+    End If
+
+    If sLocaleIDField > "" Then
+      dAttributes.Add "locale_id", userRS(sLocaleIDField).Value
+    End If
+
+    ' If you need more custom user fields, add additional entries below as well as above in the settings.
+    If sUserFieldKey1 > "" And sUserFieldValue1 > "" Then
+      dUserFields.Add Encode_UTF8(sUserFieldKey1), Encode_UTF8(userRS(sUserFieldValue1).Value)
+    End If
+
+    If sUserFieldKey2 > "" And sUserFieldValue2 > "" Then
+      dUserFields.Add Encode_UTF8(sUserFieldKey2), Encode_UTF8(userRS(sUserFieldValue2).Value)
+    End If
+
     Set GetAuthenticatedUser = dAttributes
-  else
+  Else
     Set GetAuthenticatedUser = Nothing
-  end if
+  End if
 
   userRS.Close
   oConn.Close
