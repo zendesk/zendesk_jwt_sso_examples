@@ -19,7 +19,7 @@ def index(request):
 
   subdomain  = "{my zendesk subdomain}"
   shared_key = "{my zendesk token}"
-  jwt_string = jwt.encode(payload, shared_key)
+  jwt_string = jwt.encode(payload, shared_key).decode('utf-8')
   location = "https://" + subdomain + ".zendesk.com/access/jwt?jwt=" + jwt_string
   return_to = request.GET.get('return_to')
 
