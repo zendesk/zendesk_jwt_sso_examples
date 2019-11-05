@@ -7,6 +7,7 @@ import uuid
 import jwt
 import urllib
  
+app = Flask(__name__)
 # insert token here
 app.config['SHARED_KEY'] = ''
 # insert account prefix here (e.g. yoursite.zendesk.com)
