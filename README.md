@@ -4,7 +4,7 @@ The files in this repository are examples and not guaranteed to run or be correc
 
 ## Documentation
 
-Further documentation on JWT based Zendesk SSO is available [in our knowledge base](https://support.zendesk.com/entries/23675367)
+Further documentation on JWT based Zendesk SSO is available [in our knowledge base](https://support.zendesk.com/hc/en-us/articles/4408845838874-Enabling-JWT-JSON-Web-Token-single-sign-on)
 
 ## Contributing
 
@@ -12,7 +12,7 @@ Examples and improvements much appreciated.
 
 ### License
 
-Copyright 2013 Zendesk
+Copyright 2022 Zendesk
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
