@@ -25,7 +25,7 @@ defmodule ZendeskSso do
   end
 
   # this assumes the session is already authenticated
-  def authenticate_zendesk(conn, _params) do
+  def authenticate_zendesk(conn, params) do
     zendesk_config = Application.get_env(:zendesk)
     zendesk_subdomain = Keyword.get(zendesk_config, :subdomain)
 
