@@ -1,0 +1,22 @@
+<html>
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+      // handle authenticating the user in your system and return the generated JWT
+
+      // (Assuming AJAX successfully returns a JWT)
+      // On Success - Add the JWT to a hidden form and submit
+      document.getElementById('jwtInput').value = response.data.jwt; // Extract the JWT from the response
+      document.forms['jwtForm'].submit();
+    }
+  </script>
+  ...
+  <div>
+    <form id="yourLoginForm" onsubmit="handleLogin()">
+      ...
+    </form>
+    <form id="jwtForm" method="post" action="https://{YOUR_ZENDESK_SUBDOMAIN}.zendesk.com/access/jwt">
+      <input id="jwtInput" type="hidden" name="jwt" />
+    </form>
+  </div>
+</html>
