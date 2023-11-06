@@ -2,6 +2,10 @@
 
 The files in this repository are examples and not guaranteed to run or be correct. They should explain you how you can make Zendesk SSO work with JWT from your stack. Pull requests much appreciated.
 
+The `jwt_generation` folder contains examples on how to generate JWTs. You can generate JWTs on your server and return it to your client. You may also want to return the Zendesk JWT URL with your subdomain to prevent hardcoding it in your client code.
+
+The `form_submission` folder contains examples of how to trigger the POST request with the JWT in the body of the request. This must be done via form submission as other methods of creating POST requests such as axios or fetch will be blocked by CORS.
+
 ## Documentation
 
 Further documentation on JWT based Zendesk SSO is available [in our knowledge base](https://support.zendesk.com/hc/en-us/articles/4408845838874-Enabling-JWT-single-sign-on)
