@@ -1,0 +1,83 @@
+# Helpful Documentation:
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages#building-go
+
+name: "CodeQL Advanced"
+
+# Change to run solely on daily schedule if long run times are severely impacting productivity
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '20 14 * * 6'
+
+env:
+  ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+  ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  packages: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: [ self-hosted, zendesk-stable ] # adjust as needed
+    timeout-minutes: 60 # adjust as needed
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # you can add more languages below as per the needs of your repository.
+        # interpreted languages will usually use build-mode: none, the rest use build-mode: autobuild.
+        # if that fails, commonly for kotlin/swift projects, then manual mode is needed.
+        # you can find a link to the full list of supported languages and their respective build modes at the top of this file.
+        include:
+          - language: java-kotlin
+            build-mode: manual
+          - language: actions
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # this is the file used to customize your codeql run such as ignoring certain folders, specifying a source folder
+          # or choosing which query packs to keep/add/ignore.
+          # Please remove the below two lines for public repositories
+          config-file: zendesk/prodsec-codeql/config/codeql-config.yml@main
+          external-repository-token: ${{ secrets.CODEQL_GITHUB_TOKEN }}
+
+      - name: Set up JDK
+        if: ${{ matrix.build-mode == 'manual' }}
+        uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'zulu'
+          java-version-file: .java-version
+          cache: 'gradle'
+
+      - name: Optimize Gradle properties for CI build
+        if: ${{ matrix.build-mode == 'manual' }}
+        run: |
+          mkdir -p ~/.gradle
+          cp gradle.properties ~/.gradle/gradle.properties
+
+      - name: Build all modules
+        if: ${{ matrix.build-mode == 'manual' }}
+        run: ./gradlew assemble -x test --no-daemon
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{matrix.language}}"
