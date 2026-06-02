@@ -7,9 +7,9 @@ name: "CodeQL Advanced"
 # Change to run solely on daily schedule if long run times are severely impacting productivity
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
   schedule:
     - cron: '20 14 * * 6'
 
